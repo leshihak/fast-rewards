@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import app from '../../firebase';
+import { useHistory } from 'react-router-dom';
+
+import { AuthContext } from '../AuthProvider';
 
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -30,9 +34,28 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LogInScreen = () => {
+  const history = useHistory();
   const classes = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const currentUser = useContext(AuthContext);
+
+  useEffect(() => {
+    if (currentUser) {
+      history.push('/');
+    }
+}, [history, currentUser])
+
+  const onLogin = (event) => {
+    event.preventDefault();
+
+    app.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user, "user");
+      })
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -74,7 +97,7 @@ const LogInScreen = () => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() => {}}
+            onClick={(event) => onLogin(event)}
           >
             Login
           </Button>

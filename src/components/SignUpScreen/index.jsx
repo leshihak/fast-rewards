@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import app from '../../firebase';
+import { v4 as uuidv4 } from 'uuid';
+import { useHistory } from 'react-router-dom';
 
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -29,12 +32,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const database = app.database(process.env.REACT_APP_DATABASE_URL)
+
 const SignUpScreen = () => {
   const classes = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const history = useHistory();
+
+  const onRegister = (event) => {
+    event.preventDefault();
+
+    app.auth().createUserWithEmailAndPassword(email, password).then(() => {
+      database.ref('/user/' + uuidv4()).set({firstName, lastName});
+      history.push('/');
+    })
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -100,7 +115,7 @@ const SignUpScreen = () => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() => {}}
+            onClick={(event) => onRegister(event)}
           >
             Sign Up
           </Button>
