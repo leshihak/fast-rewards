@@ -14,9 +14,7 @@ export default function AuthProvider({ children })  {
     }, []);
 
     useEffect(() => {
-        console.log(history && history);
         if (currentUser && history) {
-            console.log("here");
             history.push('/');
         }
     }, [currentUser, history])

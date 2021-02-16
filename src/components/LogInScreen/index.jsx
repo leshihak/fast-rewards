@@ -1,31 +1,32 @@
-import React, { useState, useEffect, useContext } from 'react';
-import app from '../../firebase';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from "react";
+import app from "../../firebase";
+import { useHistory } from "react-router-dom";
 
-import { AuthContext } from '../AuthProvider';
+import { AuthContext } from "../AuthProvider";
 
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import Button from "@material-ui/core/Button";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import Link from "@material-ui/core/Link";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%',
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -38,24 +39,24 @@ const LogInScreen = () => {
   const classes = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const currentUser = useContext(AuthContext);
 
   useEffect(() => {
     if (currentUser) {
-      history.push('/');
+      history.push("/");
     }
-}, [history, currentUser])
+  }, [history, currentUser]);
 
   const onLogin = (event) => {
     event.preventDefault();
 
-    app.auth().signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user, "user");
-      })
-  }
+    app
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => setError(error.message));
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -75,7 +76,7 @@ const LogInScreen = () => {
             name="email"
             autoComplete="email"
             autoFocus
-            onChange={event => setEmail(event.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
             value={email}
           />
           <TextField
@@ -88,7 +89,7 @@ const LogInScreen = () => {
             type="password"
             id="password"
             autoComplete="current-password"
-            onChange={event => setPassword(event.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
             value={password}
           />
           <Button
@@ -110,8 +111,10 @@ const LogInScreen = () => {
           </Grid>
         </form>
       </div>
+
+      {error && <Alert severity="error">{error}</Alert>}
     </Container>
   );
-}
+};
 
 export default LogInScreen;
